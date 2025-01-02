@@ -6,6 +6,13 @@ class Vehicle {
     public function __construct($db) {
         $this->conn = $db;
     }
+    public function getVehicleById($vehicleId) {
+        $query = "SELECT * FROM vehicles WHERE id = :vehicleId";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':vehicleId', $vehicleId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     public function getVehicles($search = "", $category = "") {
         $query = "SELECT 

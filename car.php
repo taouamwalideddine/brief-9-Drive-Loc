@@ -247,13 +247,14 @@ $categories = $vehicleObj->getCategories();
                                     $<?php echo number_format($vehicle['PricePerDay'], 2); ?>/Day
                                 </span>
                                 <?php if ($vehicle['status'] === 'available'): ?>
-                                    <a class="btn btn-primary px-3" 
-                                       href="booking.php?id=<?php echo $vehicle['vehicleId']; ?>">
-                                        Book Now
-                                    </a>
-                                <?php else: ?>
-                                    <span class="btn btn-secondary px-3 disabled">Not Available</span>
-                                <?php endif; ?>
+    <a class="btn btn-primary px-3" 
+       href="booking.php?vehicle_id=<?php echo htmlspecialchars($vehicle['vehicleId']); ?>">
+        Book Now
+    </a>
+<?php else: ?>
+    <span class="btn btn-secondary px-3 disabled">Not Available</span>
+<?php endif; ?>
+
                             </div>
                             
                             <?php if ($vehicle['review_count'] > 0): ?>
