@@ -92,7 +92,7 @@ $categories = $vehicleObj->getCategories();
                     <div class="navbar-nav ml-auto py-0">
                         <a href="index.html" class="nav-item nav-link active">Home</a>
 
-                                <a href="car.html" class="nav-item nav-link ">Car Listing</a>
+                                <a href="car.php" class="nav-item nav-link ">Car Listing</a>
                                 <a href="detail.html" class="nav-item nav-link ">Car Detail</a>
                                 <a href="booking.html" class="nav-item nav-link ">Car Booking</a>
                            
@@ -166,9 +166,44 @@ $categories = $vehicleObj->getCategories();
 
     <!-- Rent A Car Start -->
     <div class="container-fluid py-5">
-        <div class="container pt-5 pb-3">
-            <h1 class="display-4 text-uppercase text-center mb-5">Available Vehicles</h1>
+    <div class="container pt-5 pb-3">
+        <h1 class="display-4 text-uppercase text-center mb-5">Available Vehicles</h1>
+        
+        <!-- Search and Filter Form -->
+        <form class="mb-5" method="GET">
             <div class="row">
+                <!-- Search Input -->
+                <div class="col-md-6 mb-3">
+                    <input type="text" 
+                           name="search" 
+                           class="form-control" 
+                           placeholder="Search by brand or model" 
+                           value="<?php echo htmlspecialchars($search); ?>">
+                </div>
+
+                <!-- Category Dropdown -->
+                <div class="col-md-4 mb-3">
+                    <select name="category" class="form-control">
+                        <option value="">All Categories</option>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?php echo htmlspecialchars($cat['category']); ?>"
+                                <?php echo $cat['category'] === $category ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($cat['category']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Vehicles List -->
+        <div class="row">
+            <?php if (!empty($vehicles)): ?>
                 <?php foreach ($vehicles as $vehicle): ?>
                     <div class="col-lg-4 col-md-6 mb-2">
                         <div class="rent-item mb-4">
@@ -221,7 +256,6 @@ $categories = $vehicleObj->getCategories();
                                 <?php endif; ?>
                             </div>
                             
-                            <!-- Reviews summary -->
                             <?php if ($vehicle['review_count'] > 0): ?>
                                 <div class="mt-3 pt-3 border-top">
                                     <small class="text-muted">
@@ -232,9 +266,15 @@ $categories = $vehicleObj->getCategories();
                         </div>
                     </div>
                 <?php endforeach; ?>
-            </div>
+            <?php else: ?>
+                <div class="col-12">
+                    <p class="text-center text-muted">No vehicles found.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
+
     <!-- Rent A Car End -->
 
 
