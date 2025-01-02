@@ -1,3 +1,17 @@
+<?php
+require_once "config/Database.php";
+require_once "models/Vehicle.php";
+
+$db = (new Database())->getConnection();
+$vehicleObj = new Vehicle($db);
+
+$search = $_GET['search'] ?? "";
+$category = $_GET['category'] ?? "";
+
+$vehicles = $vehicleObj->getVehicles($search, $category);
+$categories = $vehicleObj->getCategories();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -153,134 +167,71 @@
     <!-- Rent A Car Start -->
     <div class="container-fluid py-5">
         <div class="container pt-5 pb-3">
-            <h1 class="display-4 text-uppercase text-center mb-5">Find Your Car</h1>
+            <h1 class="display-4 text-uppercase text-center mb-5">Available Vehicles</h1>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-1.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
+                <?php foreach ($vehicles as $vehicle): ?>
+                    <div class="col-lg-4 col-md-6 mb-2">
+                        <div class="rent-item mb-4">
+                            <img class="img-fluid mb-4" 
+                                src="<?php echo htmlspecialchars($vehicle['imageURL'] ?: 'img/default-car.jpg'); ?>" 
+                                alt="<?php echo htmlspecialchars($vehicle['brand'] . ' ' . $vehicle['model']); ?>">
+                            
+                            <h4 class="text-uppercase mb-4">
+                                <?php echo htmlspecialchars($vehicle['brand'] . ' ' . $vehicle['model']); ?>
+                            </h4>
+                            
+                            <div class="d-flex justify-content-center mb-4">
+                                <div class="px-2">
+                                    <i class="fa fa-car text-primary mr-1"></i>
+                                    <span><?php echo htmlspecialchars($vehicle['year']); ?></span>
+                                </div>
+                                <div class="px-2 border-left border-right">
+                                    <i class="fa fa-tag text-primary mr-1"></i>
+                                    <span><?php echo htmlspecialchars($vehicle['category']); ?></span>
+                                </div>
+                                <div class="px-2">
+                                    <?php if (isset($vehicle['avg_rating'])): ?>
+                                        <i class="fa fa-star text-primary mr-1"></i>
+                                        <span><?php echo number_format($vehicle['avg_rating'], 1); ?> 
+                                        (<?php echo $vehicle['review_count']; ?>)</span>
+                                    <?php else: ?>
+                                        <i class="fa fa-star-o text-primary mr-1"></i>
+                                        <span>No ratings</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
+                            
+                            <div class="mb-3">
+                                <p class="text-sm text-muted">
+                                    <?php echo htmlspecialchars(substr($vehicle['description'], 0, 100) . '...'); ?>
+                                </p>
                             </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-primary font-weight-bold">
+                                    $<?php echo number_format($vehicle['PricePerDay'], 2); ?>/Day
+                                </span>
+                                <?php if ($vehicle['status'] === 'available'): ?>
+                                    <a class="btn btn-primary px-3" 
+                                       href="booking.php?id=<?php echo $vehicle['vehicleId']; ?>">
+                                        Book Now
+                                    </a>
+                                <?php else: ?>
+                                    <span class="btn btn-secondary px-3 disabled">Not Available</span>
+                                <?php endif; ?>
                             </div>
+                            
+                            <!-- Reviews summary -->
+                            <?php if ($vehicle['review_count'] > 0): ?>
+                                <div class="mt-3 pt-3 border-top">
+                                    <small class="text-muted">
+                                        <?php echo $vehicle['review_count']; ?> customer reviews
+                                    </small>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item active mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-2.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-3.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-4.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-5.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-2">
-                    <div class="rent-item mb-4">
-                        <img class="img-fluid mb-4" src="img/car-rent-6.png" alt="">
-                        <h4 class="text-uppercase mb-4">Mercedes Benz R3</h4>
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="px-2">
-                                <i class="fa fa-car text-primary mr-1"></i>
-                                <span>2015</span>
-                            </div>
-                            <div class="px-2 border-left border-right">
-                                <i class="fa fa-cogs text-primary mr-1"></i>
-                                <span>AUTO</span>
-                            </div>
-                            <div class="px-2">
-                                <i class="fa fa-road text-primary mr-1"></i>
-                                <span>25K</span>
-                            </div>
-                        </div>
-                        <a class="btn btn-primary px-3" href="">$99.00/Day</a>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
